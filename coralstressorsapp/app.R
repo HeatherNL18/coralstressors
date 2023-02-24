@@ -4,8 +4,20 @@ library(tidyverse)
 library(bslib) #themes for shinyapp
 library(here)
 
+#for maps
+library(tmap)
+library(tmaptools)
+tmap_mode("plot")
+library(sf)
+library(raster)
+library(tiff)
+
+
 # SETUP DATASETS HERE
 corals_info <- read_csv(here("data", "corals_info.csv"))
+#sst_extremes <- "sst_extremes_2020.tif" not reading in as of now
+#sst <- raster(sst_extremes) #one of the stressor datasets
+
 
 #for first graph -- individual species' vulnerabilities to different stressors
 top10_species <- corals_info %>%
@@ -156,17 +168,17 @@ tabPanel("Stressor Graphs",
 
 
 
-                  #MAP TWO - MELISSA
-             #     tabPanel("Thing 4",  #tabs up at the top we can select between
-                       #    sidebarLayout( #creates a page that has a sidebar on one side that we can put widgets/explanations on one side, and then a larger panel on the right for graph/map
-                         #    sidebarPanel("Widgets",
-                                     #     checkboxGroupInput(
-                                      #      inputId = "pick_species", label = "Choose Species:",
-                                        #    choices = unique(dataset$columnn_name)
-                                    #      )
-                        #     ), #end sidebarPanel
-                         #    mainPanel("Output",
-                        #               plotOutput("plot_1")) #call your graph or thing from below here, this line of code comes from what you called your plot in output$plot below in the server
+#MAP TWO - MELISSA
+tabPanel("Map of Environmental Stressors"),  #tabs up at the top we can select between
+                       #sidebarLayout( #creates a page that has a sidebar on one side that we can put widgets/explanations on one side, and then a larger panel on the right for graph/map
+                       #sidebarPanel("Stressor Options",
+                                     #checkboxGroupInput(
+                                     # inputId = "pick_stressor", label = "Choose Stressor:",
+                                      #choices = unique(data = "sst_extremes_2020.tif") a map will appear in this tab
+                                     #)
+                           #), #end sidebarPanel
+                          #  mainPanel("Output",
+                                      # plotOutput("stressor_map")) #call your graph or thing from below here, this line of code comes from what you called your plot in output$plot below in the server
                          #  ) #end sidebar layout
                 #  ), #end tabPanel("Thing 4")
 
@@ -365,11 +377,13 @@ server <- function(input, output) {
 
   # MAP TWO REACTIVE - MELISSA
 
-  #sw_reactive_2 <- reactive((
+  #stressor_map <- reactive((
 
  # ))
 
-  #output$plot_name <- #graph or map function like in R markdown here
+  #output$stressor_map <- tm_shape(sst) +
+  #tm_raster(palette = "Blues") +
+    #tm_layout(legend.outside = TRUE)
 
     #now we need to tell user interface where to put the plot we created. go back up to UI and show where you want it to go
 
