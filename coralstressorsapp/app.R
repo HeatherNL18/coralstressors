@@ -107,7 +107,7 @@ tabPanel("Species Vulnerability Graphs",  #tabs up at the top we can select betw
                   ), #end tabPanel("Thing 2")
 
 
-tabPanel("Stressor Graphs",
+tabPanel("Stressor Graph",
                           sidebarLayout(
                             sidebarPanel("Stressor Options",
                                           selectInput(
