@@ -9,8 +9,7 @@ corals_info <- read_csv(here("data", "corals_info.csv"))
 
 #for first graph -- individual species' vulnerabilities to different stressors
 top10_species <- corals_info %>%
-  filter(species == c("acanthastrea brevis", "acanthastrea echinata", "acanthastrea hemprichii")) %>%  #change these later depending on what species we want
-  return(top10_species)
+  filter(species %in% c("acanthastrea brevis", "acanthastrea echinata", "acanthastrea hemprichii"))  #change these later depending on what species we want
 
 #for second graph -- one stressor for each species
 # stressors_top10_species <- corals_info %>%
@@ -102,7 +101,7 @@ tabPanel("Species Vulnerability Graphs",  #tabs up at the top we can select betw
                                           )
                              ), #end sidebarPanel
                              mainPanel("Individual Species Vulnerability to All Stressors",
-                                       plotOutput("species_graph")) #call your graph or thing from below here, this line of code comes from what you called your plot in output$plot below in the server
+                                       plotOutput("species_graph", width = "600px")) #call your graph or thing from below here, this line of code comes from what you called your plot in output$plot below in the server
                            ) #end sidebar layout
                   ), #end tabPanel("Thing 2")
 
@@ -325,17 +324,19 @@ server <- function(input, output) {
   graph_byspecies <- reactive((
     top10_species %>%
      filter(species == input$pick_species)
+    #%>%
+    #  filter(stressor %in% c("inorganic_pollution", "light_pollution"))
   ))
 
   output$species_graph <- renderPlot(
     ggplot(data = graph_byspecies(), aes(x = stressor, y = vuln)) +
-      geom_col() +
-      scale_x_discrete(labels = function(x)
-        stringr::str_wrap(x, width = 10)) +
+      geom_col(aes(color = stressor, fill = stressor)) +
+      scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+      coord_flip() +
       ylim(0,1) +
-      labs(x = "Stressor", y = "Vulnerability") +
+      labs(x = "Stressor", y = "Vulnerability") + #reactive title
       theme_minimal() +
-    scale_fill_manual(values = c("inorganic_pollution" = "#329ea8"))) #how do i get this color actually on the graph?
+      theme(legend.position = "none"))
 
   #graph two
   graph_bystressor <- reactive((
@@ -345,21 +346,13 @@ server <- function(input, output) {
 
   output$stressor_graph <- renderPlot(
     ggplot(data = graph_bystressor(), aes(x = species, y = vuln)) +
-      geom_col() +
+      geom_col(aes(color = species, fill = species)) +
       scale_x_discrete(labels = function(x)
         stringr::str_wrap(x, width = 10)) +
     ylim(0,1) +
-      labs(x = "Species", y = "Vulnerability") +
-      #scale_fill_manual(values = c("acanthastrea brevis" = "blue", "acanthastrea echinata" = "red", "acanthastrea hemprichii" = "green")) +
-      theme_minimal()) #something is wrong with this, output isn't showing what I want, but it's generally working. I want all species from the dataset on the x-axis
-
-
-
-
-
-
-
-
+      labs(x = "Species", y = "Vulnerability", title = top10_species$species) + #reactive title?
+      theme_minimal() +
+      theme(legend.position = "none"))
 
 
 
