@@ -11,12 +11,21 @@ tmap_mode("plot")
 library(sf)
 library(raster)
 library(tiff)
+library(leaflet)
+
 
 
 # SETUP DATASETS HERE
 corals_info <- read_csv(here("data", "corals_info.csv"))
-#sst_extremes <- "sst_extremes_2020.tif" not reading in as of now
-#sst <- raster(sst_extremes) #one of the stressor datasets
+
+#stressor map files
+filename = here("data", "stressor_maps", "sst_extremes_2020.tif" )
+sst <- raster(filename)
+filename2 = here("data", "stressor_maps", "ocean_acidification_2020.tif")
+oa <- raster(filename2)
+
+
+
 
 
 #for first graph -- individual species' vulnerabilities to different stressors
@@ -169,18 +178,21 @@ tabPanel("Stressor Graphs",
 
 
 #MAP TWO - MELISSA
-tabPanel("Map of Environmental Stressors"),  #tabs up at the top we can select between
+tabPanel("Map of Environmental Stressors",  #tabs up at the top we can select between
                        #sidebarLayout( #creates a page that has a sidebar on one side that we can put widgets/explanations on one side, and then a larger panel on the right for graph/map
-                       #sidebarPanel("Stressor Options",
-                                     #checkboxGroupInput(
-                                     # inputId = "pick_stressor", label = "Choose Stressor:",
-                                      #choices = unique(data = "sst_extremes_2020.tif") a map will appear in this tab
-                                     #)
-                           #), #end sidebarPanel
-                          #  mainPanel("Output",
-                                      # plotOutput("stressor_map")) #call your graph or thing from below here, this line of code comes from what you called your plot in output$plot below in the server
-                         #  ) #end sidebar layout
-                #  ), #end tabPanel("Thing 4")
+                       sidebarPanel("Stressor Options",
+                                    checkboxGroupInput(
+                                     inputId = "pick_stressor", label = "Choose Stressor:",
+                                     choices = unique(corals_info$stressor,
+                                                        #"sst" = "sst_extremes_2020.tif",
+                                                     #"oa" = "ocean_acidification_2020.tif"
+                                                      #"uv" = "uv_radiation_2020.tif" #a map of the specified stressor will appear in this tab
+                                     )
+                                                      , #end sidebarPanel
+                         mainPanel(
+                           tmapOutput(outputId = "stressor_Tmap")) #call your graph or thing from below here, this line of code comes from what you called your plot in output$plot below in the server
+                          ) #end sidebar layout
+                  )), #end tabPanel("Thing 4")
 
 
 
@@ -377,14 +389,13 @@ server <- function(input, output) {
 
   # MAP TWO REACTIVE - MELISSA
 
-  #stressor_map <- reactive((
 
- # ))
+#map_bystressor <- reactive((filename = here("data", "stressor_maps", input$pickstressor )))
+#filename_r <- raster(map_bystressor)
 
-  #output$stressor_map <- tm_shape(sst) +
-  #tm_raster(palette = "Blues") +
-    #tm_layout(legend.outside = TRUE)
 
+stressor_Tmap <- tm_shape() + tm_raster(palette = "Oranges") + tm_layout(legend.outside = TRUE)
+#output$stressor_map <- tmap_leaflet(stressor_Tmap) #tried leaflet
     #now we need to tell user interface where to put the plot we created. go back up to UI and show where you want it to go
 
 
